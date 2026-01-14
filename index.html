@@ -1,13 +1,201 @@
+/**
+ * LingoDash Standalone Setup
+ * * If your GitHub page is blank, it's because browsers don't natively 
+ * understand ".jsx" files or "import" statements without a build step.
+ * * To fix the blank page in a simple GitHub repository:
+ * 1. Delete this file (main.jsx).
+ * 2. Delete App.jsx.
+ * 3. Put all your code inside a single "index.html" file.
+ * * Below is how you should structure your index.html to make it work
+ * instantly on GitHub Pages:
+ */
+
+/*
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>LingoDash - Fun Language Learning</title>
+<html>
+<head>
+    <title>LingoDash</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-  </head>
-  <body>
+</head>
+<body>
     <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+    <script type="text/babel">
+        import React, { useState, useEffect } from 'react';
+import { 
+  Globe, 
+  XCircle, 
+  Trophy, 
+  Home, 
+  Star, 
+  ChevronLeft, 
+  Book, 
+  Lock, 
+  CheckCircle2,
+  Settings,
+  Flame
+} from 'lucide-react';
+
+// --- MASSIVE EXPANDED DICTIONARY ---
+const DICTIONARY = {
+  pronouns: {
+    'I': { es: 'Yo', fr: 'Je', de: 'Ich', it: 'Io', da: 'Jeg', nl: 'Ik', sv: 'Jag', no: 'Jeg', pt: 'Eu', pl: 'Ja' },
+    'He': { es: 'Él', fr: 'Il', de: 'Er', it: 'Lui', da: 'Han', nl: 'Hij', sv: 'Han', no: 'Han', pt: 'Ele', pl: 'On' },
+    'She': { es: 'Ella', fr: 'Elle', de: 'Sie', it: 'Lei', da: 'Hun', nl: 'Zij', sv: 'Hon', no: 'Hun', pt: 'Ela', pl: 'Ona' },
+    'You': { es: 'Tú', fr: 'Tu', de: 'Du', it: 'Tu', da: 'Du', nl: 'Jij', sv: 'Du', no: 'Du', pt: 'Tu', pl: 'Ty' }
+  },
+  verbs: {
+    'eat': { es: 'comer', fr: 'manger', de: 'essen', it: 'mangiare', da: 'spise', nl: 'eten', sv: 'äta', no: 'spise', pt: 'comer', pl: 'jeść' },
+    'speak': { es: 'hablar', fr: 'parler', de: 'sprechen', it: 'parlare', da: 'tale', nl: 'spreken', sv: 'tala', no: 'snakke', pt: 'falar', pl: 'mówić' },
+    'want': { es: 'querer', fr: 'vouloir', de: 'wollen', it: 'volere', da: 'vil have', nl: 'willen', sv: 'vill ha', no: 'vil ha', pt: 'querer', pl: 'chcieć' },
+    'see': { es: 'ver', fr: 'voir', de: 'sehen', it: 'vedere', da: 'se', nl: 'zien', sv: 'se', no: 'se', pt: 'ver', pl: 'widzieć' },
+    'drink': { es: 'beber', fr: 'boire', de: 'trinken', it: 'bere', da: 'drikke', nl: 'drinken', sv: 'dricka', no: 'drikke', pt: 'beber', pl: 'pić' },
+    'read': { es: 'leer', fr: 'lire', de: 'lesen', it: 'leggere', da: 'læse', nl: 'lezen', sv: 'läsa', no: 'lese', pt: 'ler', pl: 'czytać' },
+    'run': { es: 'correr', fr: 'courir', de: 'laufen', it: 'correre', da: 'løbe', nl: 'rennen', sv: 'springa', no: 'løpe', pt: 'correr', pl: 'biegać' },
+    'write': { es: 'escribir', fr: 'écrire', de: 'schreiben', it: 'scrivere', da: 'skrive', nl: 'schrijven', sv: 'skriva', no: 'skrive', pt: 'escrever', pl: 'pisać' },
+    'play': { es: 'jugar', fr: 'jouer', de: 'spielen', it: 'giocare', da: 'lege', nl: 'spelen', sv: 'spela', no: 'leke', pt: 'jogar', pl: 'grać' },
+    'jump': { es: 'saltar', fr: 'sauter', de: 'springen', it: 'saltare', da: 'hoppe', nl: 'springen', sv: 'hoppa', no: 'hoppe', pt: 'pular', pl: 'skakać' },
+    'swim': { es: 'nadar', fr: 'nager', de: 'schwimmen', it: 'nuotare', da: 'svømme', nl: 'zwemmen', sv: 'simma', no: 'svømme', pt: 'nadar', pl: 'pływać' },
+    'dance': { es: 'bailar', fr: 'danser', de: 'tanzen', it: 'ballare', da: 'danse', nl: 'dansen', sv: 'dansa', no: 'danse', pt: 'dançar', pl: 'tańczyć' },
+    'sing': { es: 'cantar', fr: 'chanter', de: 'singen', it: 'cantare', da: 'synge', nl: 'zingen', sv: 'sjunga', no: 'synge', pt: 'cantar', pl: 'śpiewać' },
+    'sleep': { es: 'dormir', fr: 'dormir', de: 'schlafen', it: 'dormire', da: 'sove', nl: 'slapen', sv: 'sova', no: 'sove', pt: 'dormir', pl: 'spać' },
+    'walk': { es: 'caminar', fr: 'marcher', de: 'gehen', it: 'camminare', da: 'gå', nl: 'lopen', sv: 'gå', no: 'gå', pt: 'caminhar', pl: 'spacerować' },
+    'draw': { es: 'dibujar', fr: 'dessiner', de: 'zeichnen', it: 'disegnare', da: 'tegne', nl: 'tekenen', sv: 'rita', no: 'tegne', pt: 'desenhar', pl: 'rysować' },
+    'cook': { es: 'cocinar', fr: 'cuisiner', de: 'kochen', it: 'cucinare', da: 'lave mad', nl: 'koken', sv: 'laga mat', no: 'lage mat', pt: 'cozinhar', pl: 'gotować' },
+    'listen': { es: 'escuchar', fr: 'écouter', de: 'hören', it: 'ascoltare', da: 'lytte', nl: 'luisteren', sv: 'lyssna', no: 'lytte', pt: 'ouvir', pl: 'słuchać' },
+    'find': { es: 'encontrar', fr: 'trouver', de: 'finden', it: 'trovare', da: 'finde', nl: 'vinden', sv: 'hitta', no: 'finne', pt: 'encontrar', pl: 'znaleźć' },
+    'learn': { es: 'aprender', fr: 'apprendre', de: 'lernen', it: 'imparare', da: 'lære', nl: 'leren', sv: 'lära', no: 'lære', pt: 'aprender', pl: 'uczyć się' },
+    'help': { es: 'ayudar', fr: 'aider', de: 'helfen', it: 'aiutare', da: 'hjælpe', nl: 'helpen', sv: 'hjälpa', no: 'hjelpe', pt: 'ajudar', pl: 'pomagać' },
+    'work': { es: 'trabajar', fr: 'travailler', de: 'arbeiten', it: 'lavorare', da: 'arbejde', nl: 'werken', sv: 'arbeta', no: 'jobbe', pt: 'trabalhar', pl: 'pracować' },
+    'buy': { es: 'comprar', fr: 'acheter', de: 'kaufen', it: 'comprare', da: 'købe', nl: 'kopen', sv: 'köpa', no: 'kjøpe', pt: 'comprar', pl: 'kupować' },
+    'love': { es: 'amar', fr: 'aimer', de: 'lieben', it: 'amare', da: 'elske', nl: 'liefhebben', sv: 'äska', no: 'elske', pt: 'amar', pl: 'kochać' }
+  },
+  nouns: {
+    'apple': { es: 'manzana', fr: 'pomme', de: 'Apfel', it: 'mela', da: 'æble', nl: 'appel', sv: 'äpple', no: 'eple', pt: 'maçã', pl: 'jabłko' },
+    'bread': { es: 'pan', fr: 'pain', de: 'Brot', it: 'pane', da: 'brød', nl: 'brood', sv: 'bröd', no: 'brød', pt: 'pão', pl: 'chleb' },
+    'water': { es: 'agua', fr: 'eau', de: 'Wasser', it: 'acqua', da: 'vand', nl: 'water', sv: 'vatten', no: 'vann', pt: 'água', pl: 'woda' },
+    'milk': { es: 'leche', fr: 'lait', de: 'Milch', it: 'latte', da: 'mælk', nl: 'melk', sv: 'mjölk', no: 'melk', pt: 'leite', pl: 'mleko' },
+    'book': { es: 'libro', fr: 'livre', de: 'Buch', it: 'libro', da: 'bog', nl: 'boek', sv: 'bok', no: 'bok', pt: 'livro', pl: 'książka' },
+    'cat': { es: 'gato', fr: 'chat', de: 'Katze', it: 'gatto', da: 'kat', nl: 'kat', sv: 'katt', no: 'katt', pt: 'gato', pl: 'kot' },
+    'dog': { es: 'perro', fr: 'chien', de: 'Hund', it: 'cane', da: 'hund', nl: 'hond', sv: 'hund', no: 'hund', pt: 'cachorro', pl: 'pies' },
+    'house': { es: 'casa', fr: 'maison', de: 'Haus', it: 'casa', da: 'hus', nl: 'huis', sv: 'hus', no: 'hus', pt: 'casa', pl: 'dom' },
+    'tree': { es: 'árbol', fr: 'arbre', de: 'Baum', it: 'albero', da: 'træ', nl: 'boom', sv: 'träd', no: 'tre', pt: 'árvore', pl: 'drzewo' },
+    'flower': { es: 'flor', fr: 'fleur', de: 'Blume', it: 'fiore', da: 'blomst', nl: 'bloem', sv: 'blomma', no: 'blomst', pt: 'flor', pl: 'kwiat' },
+    'bird': { es: 'pájaro', fr: 'oiseau', de: 'Vogel', it: 'uccello', da: 'fugl', nl: 'vogel', sv: 'fågel', no: 'fugl', pt: 'pássaro', pl: 'ptak' },
+    'sun': { es: 'sol', fr: 'soleil', de: 'Sonne', it: 'sole', da: 'sol', nl: 'zon', sv: 'sol', no: 'sol', pt: 'sol', pl: 'słońce' },
+    'moon': { es: 'luna', fr: 'lune', de: 'Mond', it: 'luna', da: 'måne', nl: 'maan', sv: 'måne', no: 'måne', pt: 'lua', pl: 'księżyc' },
+    'star': { es: 'estrella', fr: 'étoile', de: 'Stern', it: 'stella', da: 'stjerne', nl: 'ster', sv: 'stjärna', no: 'stjerne', pt: 'estrela', pl: 'gwiazda' },
+    'car': { es: 'coche', fr: 'voiture', de: 'Auto', it: 'macchina', da: 'bil', nl: 'auto', sv: 'bil', no: 'bil', pt: 'carro', pl: 'samochód' },
+    'ball': { es: 'pelota', fr: 'ballon', de: 'Ball', it: 'palla', da: 'bold', nl: 'bal', sv: 'boll', no: 'ball', pt: 'bola', pl: 'piłka' },
+    'hat': { es: 'sombrero', fr: 'chapeau', de: 'Hut', it: 'cappello', da: 'hat', nl: 'hoed', sv: 'hatt', no: 'hatt', pt: 'chapéu', pl: 'kapelusz' },
+    'shirt': { es: 'camisa', fr: 'chemise', de: 'Hemd', it: 'camicia', da: 'skjorte', nl: 'hemd', sv: 'skjorta', no: 'skjorte', pt: 'camisa', pl: 'koszula' },
+    'shoe': { es: 'zapato', fr: 'chaussure', de: 'Schuh', it: 'scarpa', da: 'sko', nl: 'schoen', sv: 'sko', no: 'sko', pt: 'sapato', pl: 'but' },
+    'table': { es: 'mesa', fr: 'table', de: 'Tisch', it: 'tavolo', da: 'bord', nl: 'tafel', sv: 'bord', no: 'bord', pt: 'mesa', pl: 'stół' },
+    'chair': { es: 'silla', fr: 'chaise', de: 'Stuhl', it: 'sedia', da: 'stol', nl: 'stoel', sv: 'stol', no: 'stol', pt: 'cadeira', pl: 'krzesło' },
+    'phone': { es: 'teléfono', fr: 'téléphone', de: 'Telefon', it: 'telefono', da: 'telefon', nl: 'telefoon', sv: 'telefon', no: 'telefon', pt: 'telefone', pl: 'telefon' },
+    'pen': { es: 'bolígrafo', fr: 'stylo', de: 'Stift', it: 'penna', da: 'pen', nl: 'pen', sv: 'penna', no: 'penn', pt: 'caneta', pl: 'długopis' },
+    'computer': { es: 'computadora', fr: 'ordinateur', de: 'Computer', it: 'computer', da: 'computer', nl: 'computer', sv: 'dator', no: 'datamaskin', pt: 'computador', pl: 'komputer' }
+  },
+  colors: {
+    'red': { es: 'rojo', fr: 'rouge', de: 'rot', it: 'rosso', da: 'rød', nl: 'rood', sv: 'röd', no: 'rød', pt: 'vermelho', pl: 'czerwony' },
+    'blue': { es: 'azul', fr: 'bleu', de: 'blau', it: 'blu', da: 'blå', nl: 'blauw', sv: 'blå', no: 'blå', pt: 'azul', pl: 'niebieski' },
+    'green': { es: 'verde', fr: 'vert', de: 'grün', it: 'verde', da: 'grøn', nl: 'groen', sv: 'grön', no: 'grønn', pt: 'verde', pl: 'zielony' },
+    'yellow': { es: 'amarillo', fr: 'jaune', de: 'gelb', it: 'giallo', da: 'gul', nl: 'geel', sv: 'gul', no: 'gul', pt: 'amarelo', pl: 'żółty' },
+    'black': { es: 'negro', fr: 'noir', de: 'schwarz', it: 'nero', da: 'sort', nl: 'zwart', sv: 'svart', no: 'svart', pt: 'preto', pl: 'czarny' },
+    'white': { es: 'blanco', fr: 'blanc', de: 'weiß', it: 'bianco', da: 'hvid', nl: 'wit', sv: 'vit', no: 'hvit', pt: 'branco', pl: 'biały' }
+  },
+  numbers: {
+    'one': { es: 'uno', fr: 'un', de: 'eins', it: 'uno', da: 'en', nl: 'een', sv: 'ett', no: 'en', pt: 'um', pl: 'jeden' },
+    'two': { es: 'dos', fr: 'deux', de: 'zwei', it: 'due', da: 'to', nl: 'twee', sv: 'två', no: 'to', pt: 'dois', pl: 'dwa' },
+    'three': { es: 'tres', fr: 'trois', de: 'drei', it: 'tre', da: 'tre', nl: 'drie', sv: 'tre', no: 'tre', pt: 'trzy', pl: 'trzy' },
+    'four': { es: 'cuatro', fr: 'quatre', de: 'vier', it: 'quattro', da: 'fire', nl: 'vier', sv: 'fyra', no: 'fire', pt: 'quatro', pl: 'cztery' },
+    'five': { es: 'cinco', fr: 'cinq', de: 'fünf', it: 'cinque', da: 'fem', nl: 'vijf', sv: 'fem', no: 'fem', pt: 'cinco', pl: 'pięć' }
+  },
+  fallbacks: {
+    'I': 'Jeg', 'He': 'Han', 'She': 'Hun', 'You': 'Du'
+  }
+};
+
+const LANGUAGES = [
+  { id: 'da', name: 'Danish', flag: '🇩🇰', and: 'og' },
+  { id: 'es', name: 'Spanish', flag: '🇪🇸', and: 'y' },
+  { id: 'fr', name: 'French', flag: '🇫🇷', and: 'et' },
+  { id: 'de', name: 'German', flag: '🇩🇪', and: 'und' },
+  { id: 'it', name: 'Italian', flag: '🇮🇹', and: 'e' },
+  { id: 'pt', name: 'Portuguese', flag: '🇵🇹', and: 'e' },
+  { id: 'nl', name: 'Dutch', flag: '🇳🇱', and: 'en' },
+  { id: 'sv', name: 'Swedish', flag: '🇸🇪', and: 'och' },
+  { id: 'no', name: 'Norwegian', flag: '🇳🇴', and: 'og' },
+  { id: 'pl', name: 'Polish', flag: '🇵🇱', and: 'i' },
+  { id: 'jp', name: 'Japanese', flag: '🇯🇵', and: 'と' },
+  { id: 'kr', name: 'Korean', flag: '🇰🇷', and: '고' },
+  { id: 'zh', name: 'Chinese', flag: '🇨🇳', and: '和' },
+  { id: 'ru', name: 'Russian', flag: '🇷🇺', and: 'и' },
+  { id: 'tr', name: 'Turkish', flag: '🇹🇷', and: 've' },
+  { id: 'fi', name: 'Finnish', flag: '🇫🇮', and: 'ja' },
+  { id: 'gr', name: 'Greek', flag: '🇬🇷', and: 'και' },
+  { id: 'he', name: 'Hebrew', flag: '🇮🇱', and: 'ו' },
+  { id: 'hi', name: 'Hindi', flag: '🇮🇳', and: 'और' },
+  { id: 'th', name: 'Thai', flag: '🇹🇭', and: 'และ' },
+  { id: 'vi', name: 'Vietnamese', flag: '🇻🇳', and: 'và' },
+  { id: 'id', name: 'Indonesian', flag: '🇮🇩', and: 'dan' },
+  { id: 'ro', name: 'Romanian', flag: '🇷🇴', and: 'și' },
+  { id: 'hu', name: 'Hungarian', flag: '🇭🇺', and: 'és' },
+  { id: 'ar', name: 'Arabic', flag: '🇸🇦', and: 'و' }
+];
+
+const getWord = (category, key, langId) => {
+  const entry = DICTIONARY[category][key];
+  if (!entry) return DICTIONARY.fallbacks[key] || key;
+  return entry[langId] || DICTIONARY.fallbacks[key] || key;
+};
+
+const generateLessonTasks = (lang, lessonIdx) => {
+  const tasks = [];
+  const lId = lang.id;
+  const shuffle = (a) => [...a].sort(() => Math.random() - 0.5);
+
+  const addWordFlow = (category, key, list) => {
+    const foreign = getWord(category, key, lId);
+    list.push({ 
+      id: `intro-${key}-${Math.random()}`,
+      type: 'tap', 
+      prompt: `Learn the new word: "${key}"`, 
+      options: shuffle([foreign, 'Hej', 'Goddag', 'Tak']), 
+      answer: foreign 
+    });
+    list.push({ 
+      id: `reverse-${key}-${Math.random()}`,
+      type: 'tap', 
+      prompt: `What does "${foreign}" mean?`, 
+      options: shuffle([key, 'Large', 'Yellow', 'Fast']), 
+      answer: key 
+    });
+  };
+
+  if (lessonIdx === 0) {
+    ['I', 'He'].forEach(k => addWordFlow('pronouns', k, tasks));
+    const p1 = getWord('pronouns', 'I', lId);
+    const p2 = getWord('pronouns', 'He', lId);
+    tasks.push({ type: 'reorder', prompt: `Combine: "I and He"`, options: shuffle([p1, lang.and, p2]), answer: [p1, lang.and, p2] });
+  } 
+  else if (lessonIdx === 1) {
+    ['She', 'You'].forEach(k => addWordFlow('pronouns', k, tasks));
+    const
+        function App() {
+            return (
+                <div className="p-10 text-center">
+                    <h1 className="text-4xl font-bold">LingoDash is Ready!</h1>
+                    <p>Your code will now run directly in the browser.</p>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
 </html>
+*/
