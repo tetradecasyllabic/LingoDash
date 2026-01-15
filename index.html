@@ -1,407 +1,347 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LingoDash - Fun Language Learning</title>
-    <!-- React and ReactDOM Libraries -->
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <!-- Babel: This allows the browser to understand JSX/React code -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <!-- Tailwind CSS for styling -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
-        body { font-family: 'Nunito', sans-serif; }
-    </style>
-</head>
-<body class="bg-gray-50">
-    <div id="root"></div>
+import React, { useState, useEffect } from 'react';
+import { Globe, Flame, Check, X, Star, Lock, ChevronLeft, Trophy, XCircle, MessageCircle } from 'lucide-react';
 
-    <script type="text/babel">
-        // Custom SVG Icons
-        const Globe = ({ size = 24, className }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-        );
-        const XCircle = ({ onClick, className }) => (
-            <svg onClick={onClick} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-        );
-        const Trophy = ({ className }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
-        );
-        const Flame = ({ size = 24, className }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
-        );
-        const Star = ({ className }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        );
-        const ChevronLeft = () => (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-        );
-        const Lock = () => (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        );
-        const CheckCircle2 = ({ className }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg>
-        );
+const LANGUAGES = [
+  { id: 'es', name: 'Spanish', flag: '🇪🇸' }, { id: 'fr', name: 'French', flag: '🇫🇷' },
+  { id: 'de', name: 'German', flag: '🇩🇪' }, { id: 'it', name: 'Italian', flag: '🇮🇹' },
+  { id: 'pt', name: 'Portuguese', flag: '🇵🇹' }, { id: 'ja', name: 'Japanese', flag: '🇯🇵' },
+  { id: 'ko', name: 'Korean', flag: '🇰🇷' }, { id: 'zh', name: 'Chinese', flag: '🇨🇳' },
+  { id: 'tr', name: 'Turkish', flag: '🇹🇷' }, { id: 'ru', name: 'Russian', flag: '🇷🇺' },
+  { id: 'ar', name: 'Arabic', flag: '🇸🇦' }, { id: 'hi', name: 'Hindi', flag: '🇮🇳' },
+  { id: 'nl', name: 'Dutch', flag: '🇳🇱' }, { id: 'sv', name: 'Swedish', flag: '🇸🇪' },
+  { id: 'pl', name: 'Polish', flag: '🇵🇱' }, { id: 'vi', name: 'Vietnamese', flag: '🇻🇳' },
+  { id: 'th', name: 'Thai', flag: '🇹🇭' }, { id: 'el', name: 'Greek', flag: '🇬🇷' },
+  { id: 'he', name: 'Hebrew', flag: '🇮🇱' }, { id: 'id', name: 'Indonesian', flag: '🇮🇩' },
+  { id: 'uk', name: 'Ukrainian', flag: '🇺🇦' }, { id: 'no', name: 'Norwegian', flag: '🇳🇴' },
+  { id: 'da', name: 'Danish', flag: '🇩🇰' }, { id: 'fi', name: 'Finnish', flag: '🇫🇮' },
+  { id: 'sw', name: 'Swahili', flag: '🇰🇪' }
+];
 
-        const { useState, useEffect } = React;
+const DICTIONARY = {
+  pronouns: {
+    'I': { es: 'Yo', fr: 'Je', de: 'Ich', it: 'Io', ja: '私', zh: '我', nl: 'Ik', sv: 'Jag', pl: 'Ja', vi: 'Tôi', th: 'ฉัน', el: 'Εγώ', he: 'אני', id: 'Saya', uk: 'Я', no: 'Jeg', da: 'Jeg', fi: 'Minä', sw: 'Mimi' },
+    'You': { es: 'Tú', fr: 'Tu', de: 'Du', it: 'Tu', ja: 'あなた', zh: '你', nl: 'Jij', sv: 'Du', pl: 'Ty', vi: 'Bạn', th: 'คุณ', el: 'Εσύ', he: 'אתה', id: 'Kamu', uk: 'Ти', no: 'Du', da: 'Du', fi: 'Sinä', sw: 'Wewe' },
+    'He': { es: 'Él', fr: 'Il', de: 'Er', it: 'Lui', ja: '彼', zh: '他', nl: 'Hij', sv: 'Han', pl: 'On', vi: 'Anh ấy', th: 'เขา', el: 'Αυτός', he: 'הוא', id: 'Dia', uk: 'Він', no: 'Han', da: 'Han', fi: 'Hän', sw: 'Yeye' },
+    'She': { es: 'Ella', fr: 'Elle', de: 'Sie', it: 'Lei', ja: '彼女', zh: '她', nl: 'Zij', sv: 'Hon', pl: 'Ona', vi: 'Cô ấy', th: 'เธอ', el: 'Αυτή', he: 'היא', id: 'Dia', uk: 'Вона', no: 'Hun', da: 'Hun', fi: 'Hän', sw: 'Yeye' },
+    'We': { es: 'Nosotros', fr: 'Nous', de: 'Wir', it: 'Noi', ja: '私たち', zh: '我们', nl: 'Wij', sv: 'Vi', pl: 'My', vi: 'Chúng tôi', th: 'พวกเรา', el: 'Εμείς', he: 'אנחנו', id: 'Kami', uk: 'Ми', no: 'Vi', da: 'Vi', fi: 'Me', sw: 'Sisi' },
+    'They': { es: 'Ellos', fr: 'Ils', de: 'Sie', it: 'Loro', ja: '彼ら', zh: '他们', nl: 'Zij', sv: 'De', pl: 'Oni', vi: 'Họ', th: 'พวกเขา', el: 'Αυτοί', he: 'הם', id: 'Mereka', uk: 'Вони', no: 'De', da: 'De', fi: 'He', sw: 'Wao' }
+  },
+  phrases: {
+    'Hello': { es: 'Hola', fr: 'Bonjour', de: 'Hallo', it: 'Ciao', ja: 'こんにちは', zh: '你好', nl: 'Hallo', sv: 'Hej', pl: 'Cześć', vi: 'Xin chào', th: 'สวัสดี', el: 'Γεια σας', he: 'שלום', id: 'Halo', uk: 'Привіт', no: 'Hei', da: 'Hej', fi: 'Hei', sw: 'Hujambo' },
+    'Good morning': { es: 'Buenos días', fr: 'Bonjour', de: 'Guten Morgen', it: 'Buongiorno', ja: 'おはよう', zh: '早上好', nl: 'Goedemorgen', sv: 'God morgon', pl: 'Dzień dobry', vi: 'Chào buổi sáng', th: 'อรุณสวัสดิ์', el: 'Καλημέρα', he: 'בוקר טוב', id: 'Selamat pagi', uk: 'Доброго ранку', no: 'God morgen', da: 'Godmorgen', fi: 'Hyvää huomenta', sw: 'Habari za asubuhi' },
+    'Good night': { es: 'Buenas noches', fr: 'Bonne nuit', de: 'Gute Nacht', it: 'Buonanotte', ja: 'おやすみ', zh: '晚安', nl: 'Goedenacht', sv: 'God natt', pl: 'Dobranoc', vi: 'Chúc ngủ ngon', th: 'ราตรีสวัสดิ์', el: 'Καληνύχτα', he: 'לילה טוב', id: 'Selamat malam', uk: 'На добраніч', no: 'God natt', da: 'Godnat', fi: 'Hyvää yötä', sw: 'Usiku mwema' },
+    'Thank you': { es: 'Gracias', fr: 'Merci', de: 'Danke', it: 'Grazie', ja: 'ありがとう', zh: '谢谢', nl: 'Dank je', sv: 'Tack', pl: 'Dziękuję', vi: 'Cảm ơn', th: 'ขอบคุณ', el: 'Ευχαριστώ', he: 'תודה', id: 'Terima kasih', uk: 'Дякую', no: 'Takk', da: 'Tak', fi: 'Kiitos', sw: 'Asante' },
+    'How are you?': { es: '¿Cómo estás?', fr: 'Comment ça va?', de: 'Wie geht es dir?', it: 'Come stai?', ja: '元気ですか', zh: '你好吗', nl: 'Hoe gaat het?', sv: 'Hur mår du?', pl: 'Jak się masz?', vi: 'Bạn khỏe không?', th: 'คุณสบายดีไหม', el: 'Πώς είστε;', he: 'מה שלומך', id: 'Apa kabar?', uk: 'Як справи?', no: 'Hvordan går det?', da: 'Hvordan har du det?', fi: 'Mitä kuuluu?', sw: 'Habari yako?' }
+  },
+  verbs: {
+    'eat': { es: 'como', fr: 'mange', de: 'esse', it: 'mangio', ja: '食べる', zh: '吃', nl: 'eet', sv: 'äter', pl: 'jem', vi: 'ăn', th: 'กิน', el: 'τρώω', he: 'אוכל', id: 'makan', uk: 'їм', no: 'spiser', da: 'spiser', fi: 'syön', sw: 'kula', thirdPerson: 'eats' },
+    'drink': { es: 'bebo', fr: 'bois', de: 'trinke', it: 'bevo', ja: '飲む', zh: '喝', nl: 'drink', sv: 'dricker', pl: 'piję', vi: 'uống', th: 'ดื่ม', el: 'πίνω', he: 'שותה', id: 'minum', uk: 'п’ю', no: 'drikker', da: 'drikker', fi: 'juon', sw: 'kunywa', thirdPerson: 'drinks' },
+    'want': { es: 'quiero', fr: 'veux', de: 'will', it: 'voglio', ja: '欲しい', zh: '想', nl: 'wil', sv: 'vill', pl: 'chcę', vi: 'muốn', th: 'ต้องการ', el: 'θέλω', he: 'רוצה', id: 'ingin', uk: 'хочу', no: 'vil', da: 'vil', fi: 'haluan', sw: 'taka', thirdPerson: 'wants' },
+    'see': { es: 'veo', fr: 'vois', de: 'sehe', it: 'vedo', ja: '見る', zh: '看', nl: 'zie', sv: 'ser', pl: 'widzę', vi: 'thấy', th: 'เห็น', el: 'βλέπω', he: 'רואה', id: 'melihat', uk: 'бачу', no: 'ser', da: 'ser', fi: 'näen', sw: 'ona', thirdPerson: 'sees' },
+    'run': { es: 'corro', fr: 'cours', de: 'laufe', it: 'corro', ja: '走る', zh: '跑', nl: 'ren', sv: 'springer', pl: 'biegam', vi: 'chạy', th: 'วิ่ง', el: 'τρέχω', he: 'רץ', id: 'lari', uk: 'біжу', no: 'løper', da: 'løber', fi: 'juoksen', sw: 'kimbia', thirdPerson: 'runs' },
+    'read': { es: 'leo', fr: 'lis', de: 'lese', it: 'leggo', ja: '読む', zh: '读', nl: 'lees', sv: 'läser', pl: 'czytam', vi: 'đọc', th: 'อ่าน', el: 'διαβάζω', he: 'קורא', id: 'membaca', uk: 'читаю', no: 'leser', da: 'læser', fi: 'luen', sw: 'soma', thirdPerson: 'reads' },
+    'play': { es: 'juego', fr: 'joue', de: 'spiele', it: 'gioco', ja: '遊ぶ', zh: '玩', nl: 'speel', sv: 'spelar', pl: 'gram', vi: 'chơi', th: 'เล่น', el: 'παίζω', he: 'משחק', id: 'main', uk: 'граю', no: 'leker', da: 'leger', fi: 'pelaan', sw: 'cheza', thirdPerson: 'plays' }
+  },
+  nouns: {
+    'bread': { es: 'pan', fr: 'pain', de: 'Brot', it: 'pane', ja: 'パン', zh: '面包', nl: 'brood', sv: 'bröd', pl: 'chleb', vi: 'bánh mì', th: 'ขนมปัง', el: 'ψωμί', he: 'לחם', id: 'roti', uk: 'хліб', no: 'brød', da: 'brød', fi: 'leipä', sw: 'mkate', article: '' },
+    'water': { es: 'agua', fr: 'eau', de: 'Wasser', it: 'acqua', ja: '水', zh: '水', nl: 'water', sv: 'vatten', pl: 'woda', vi: 'nước', th: 'น้ำ', el: 'νερό', he: 'מים', id: 'air', uk: 'вода', no: 'vann', da: 'vand', fi: 'vesi', sw: 'maji', article: '' },
+    'book': { es: 'libro', fr: 'livre', de: 'Buch', it: 'libro', ja: '本', zh: '书', nl: 'boek', sv: 'bok', pl: 'książka', vi: 'sách', th: 'หนังสือ', el: 'βιβλίο', he: 'ספר', id: 'buku', uk: 'книга', no: 'bok', da: 'bog', fi: 'kirja', sw: 'kitabu', article: 'a' },
+    'cat': { es: 'gato', fr: 'chat', de: 'Katze', it: 'gatto', ja: '猫', zh: '猫', nl: 'kat', sv: 'katt', pl: 'kot', vi: 'con mèo', th: 'แมว', el: 'γάτα', he: 'חתול', id: 'kucing', uk: 'кіт', no: 'katt', da: 'kat', fi: 'kissa', sw: 'paka', article: 'the' },
+    'dog': { es: 'perro', fr: 'chien', de: 'Hund', it: 'cane', ja: '犬', zh: '狗', nl: 'hond', sv: 'hund', pl: 'pies', vi: 'con chó', th: 'สุนัข', el: 'σκύλος', he: 'כלב', id: 'anjing', uk: 'собака', no: 'hund', da: 'hund', fi: 'koira', sw: 'mbwa', article: 'the' },
+    'sun': { es: 'sol', fr: 'soleil', de: 'Sonne', it: 'sole', ja: '太陽', zh: '太阳', nl: 'zon', sv: 'sol', pl: 'słońce', vi: 'mặt trời', th: 'ดวงอาทิตย์', el: 'ήλιος', he: 'שמש', id: 'matahari', uk: 'сонце', no: 'sol', da: 'sol', fi: 'aurinko', sw: 'jua', article: 'the' },
+    'moon': { es: 'luna', fr: 'lune', de: 'Mond', it: 'luna', ja: '月', zh: '月亮', nl: 'maan', sv: 'måne', pl: 'księżyc', vi: 'mặt trăng', th: 'ดวงจันทร์', el: 'φεγγάρι', he: 'ירח', id: 'bulan', uk: 'місяць', no: 'måne', da: 'måne', fi: 'kuu', sw: 'mwezi', article: 'the' },
+    'home': { es: 'casa', fr: 'maison', de: 'Hause', it: 'casa', ja: '家', zh: '家', nl: 'huis', sv: 'hem', pl: 'dom', vi: 'nhà', th: 'บ้าน', el: 'σπίτι', he: 'בית', id: 'rumah', uk: 'дім', no: 'hjem', da: 'hjem', fi: 'koti', sw: 'nyumbani', article: '' }
+  }
+};
 
-        const NAMES = ["Alex", "Sam", "Charlie", "Jordan", "Emma", "Leo", "Mia", "Noah", "Olivia", "Ethan", "Sophia", "Liam"];
+// Generate 15 Lessons
+const UNIT_LESSONS = [
+  { id: 0, title: "Greetings", type: 'vocabulary', cat: 'phrases' },
+  { id: 1, title: "Pronouns 1", type: 'vocabulary', cat: 'pronouns' },
+  { id: 2, title: "Common Nouns", type: 'vocabulary', cat: 'nouns' },
+  { id: 3, title: "Introduction", type: 'sentence' },
+  { id: 4, title: "Action Verbs", type: 'vocabulary', cat: 'verbs' },
+  { id: 5, title: "Simple Phrases", type: 'sentence' },
+  { id: 6, title: "Polite Words", type: 'vocabulary', cat: 'phrases' },
+  { id: 7, title: "Food & Water", type: 'vocabulary', cat: 'nouns' },
+  { id: 8, title: "Nature", type: 'vocabulary', cat: 'nouns' },
+  { id: 9, title: "Daily Actions", type: 'vocabulary', cat: 'verbs' },
+  { id: 10, title: "Big Review", type: 'sentence' },
+  { id: 11, title: "Animals", type: 'vocabulary', cat: 'nouns' },
+  { id: 12, title: "More Verbs", type: 'vocabulary', cat: 'verbs' },
+  { id: 13, title: "Sentence Mix", type: 'sentence' },
+  { id: 14, title: "Final Quiz", type: 'sentence' }
+];
 
-        const DICTIONARY = {
-          pronouns: {
-            'I': { es: 'Yo', fr: 'Je', de: 'Ich', it: 'Io', da: 'Jeg', nl: 'Ik', sv: 'Jag', no: 'Jeg', pt: 'Eu', pl: 'Ja' },
-            'He': { es: 'Él', fr: 'Il', de: 'Er', it: 'Lui', da: 'Han', nl: 'Hij', sv: 'Han', no: 'Han', pt: 'Ele', pl: 'On' },
-            'She': { es: 'Ella', fr: 'Elle', de: 'Sie', it: 'Lei', da: 'Hun', nl: 'Zij', sv: 'Hon', no: 'Hun', pt: 'Ela', pl: 'Ona' },
-            'You': { es: 'Tú', fr: 'Tu', de: 'Du', it: 'Tu', da: 'Du', nl: 'Jij', sv: 'Du', no: 'Du', pt: 'Tu', pl: 'Ty' },
-            'Me': { es: 'Mí', fr: 'Moi', de: 'Mich', it: 'Me', da: 'Mig', nl: 'Mij', sv: 'Mig', no: 'Meg', pt: 'Mim', pl: 'Mnie' }
-          },
-          phrases: {
-            'How are you?': { es: '¿Cómo estás?', fr: 'Comment ça va ?', de: 'Wie geht es dir?', it: 'Come stai?', da: 'Hvordan har du det?', nl: 'Hoe gaat het?', sv: 'Hur mår du?', no: 'Hvordan har du det?', pt: 'Como você está?', pl: 'Jak się masz?' },
-            'Good morning': { es: 'Buenos días', fr: 'Bonjour', de: 'Guten Morgen', it: 'Buongiorno', da: 'Godmorgen', nl: 'Goedemorgen', sv: 'God morgon', no: 'God morgen', pt: 'Bom dia', pl: 'Dzień dobry' },
-            'Good night': { es: 'Buenas noches', fr: 'Bonne nuit', de: 'Gute Nacht', it: 'Buonanotte', da: 'Godnat', nl: 'Goedenacht', sv: 'God natt', no: 'God natt', pt: 'Boa noite', pl: 'Dobranoc' },
-            'Thank you': { es: 'Gracias', fr: 'Merci', de: 'Danke', it: 'Grazie', da: 'Tak', nl: 'Dank je', sv: 'Tack', no: 'Takk', pt: 'Obrigado', pl: 'Dziękuję' }
-          },
-          verbs: {
-            'eat': { es: 'comer', fr: 'manger', de: 'essen', it: 'mangiare', da: 'spise', nl: 'eten', sv: 'äta', no: 'spise', pt: 'comer', pl: 'jeść' },
-            'speak': { es: 'hablar', fr: 'parler', de: 'sprechen', it: 'parlare', da: 'tale', nl: 'spreken', sv: 'tala', no: 'snakke', pt: 'falar', pl: 'mówić' },
-            'want': { es: 'querer', fr: 'vouloir', de: 'wollen', it: 'volere', da: 'vil have', nl: 'willen', sv: 'vill ha', no: 'vill ha', pt: 'querer', pl: 'chcieć' },
-            'see': { es: 'ver', fr: 'voir', de: 'sehen', it: 'vedere', da: 'se', nl: 'zien', sv: 'se', no: 'se', pt: 'ver', pl: 'widzieć' }
-          },
-          nouns: {
-            'apple': { es: 'manzana', fr: 'pomme', de: 'Apfel', it: 'mela', da: 'æble', nl: 'appel', sv: 'äpple', no: 'eple', pt: 'maçã', pl: 'jabłko' },
-            'bread': { es: 'pan', fr: 'pain', de: 'Brot', it: 'pane', da: 'brød', nl: 'brood', sv: 'bröd', no: 'brød', pt: 'pão', pl: 'chleb' },
-            'water': { es: 'agua', fr: 'eau', de: 'Wasser', it: 'acqua', da: 'vand', nl: 'water', sv: 'vatten', no: 'vann', pt: 'água', pl: 'woda' },
-            'cat': { es: 'gato', fr: 'chat', de: 'Katze', it: 'gatto', da: 'kat', nl: 'kat', sv: 'katt', no: 'katt', pt: 'gato', pl: 'kot' }
-          },
-          colors: {
-            'red': { es: 'rojo', fr: 'rouge', de: 'rot', it: 'rosso', da: 'rød', nl: 'rood', sv: 'röd', no: 'rød', pt: 'vermelho', pl: 'czerwony' },
-            'blue': { es: 'azul', fr: 'bleu', de: 'blau', it: 'blu', da: 'blå', nl: 'blauw', sv: 'blå', no: 'blå', pt: 'azul', pl: 'niebieski' },
-            'green': { es: 'verde', fr: 'vert', de: 'grün', it: 'verde', da: 'grøn', nl: 'groen', sv: 'grön', no: 'grønn', pt: 'verde', pl: 'zielony' }
-          }
-        };
+export default function App() {
+  const [view, setView] = useState('landing');
+  const [selectedLang, setSelectedLang] = useState(null);
+  const [progress, setProgress] = useState(() => JSON.parse(localStorage.getItem('lingo_progress_v25') || '{}'));
+  const [currentTasks, setCurrentTasks] = useState([]);
+  const [taskIdx, setTaskIdx] = useState(0);
+  const [selection, setSelection] = useState(null);
+  const [reorderList, setReorderList] = useState([]);
+  const [feedback, setFeedback] = useState(null);
 
-        const LANGUAGES = [
-          { id: 'da', name: 'Danish', flag: '🇩🇰', and: 'og' },
-          { id: 'es', name: 'Spanish', flag: '🇪🇸', and: 'y' },
-          { id: 'fr', name: 'French', flag: '🇫🇷', and: 'et' },
-          { id: 'de', name: 'German', flag: '🇩🇪', and: 'und' },
-          { id: 'it', name: 'Italian', flag: '🇮🇹', and: 'e' },
-          { id: 'pt', name: 'Portuguese', flag: '🇵🇹', and: 'e' },
-          { id: 'nl', name: 'Dutch', flag: '🇳🇱', and: 'en' },
-          { id: 'sv', name: 'Swedish', flag: '🇸🇪', and: 'och' },
-          { id: 'no', name: 'Norwegian', flag: '🇳🇴', and: 'og' },
-          { id: 'pl', name: 'Polish', flag: '🇵🇱', and: 'i' }
-        ];
+  useEffect(() => {
+    localStorage.setItem('lingo_progress_v25', JSON.stringify(progress));
+  }, [progress]);
 
-        const getWord = (category, key, langId) => {
-          const entry = DICTIONARY[category][key];
-          if (!entry) return key;
-          return entry[langId] || key;
-        };
+  const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
 
-        const generateLessonTasks = (lang, lessonIdx) => {
-          const tasks = [];
-          const lId = lang.id;
-          const shuffle = (a) => [...a].sort(() => Math.random() - 0.5);
-          
-          // Get 3 random words from the same language for distracting choices
-          const getWrongChoices = (category, currentKey) => {
-            const choices = Object.keys(DICTIONARY[category])
-              .filter(k => k !== currentKey)
-              .map(k => getWord(category, k, lId));
-            return shuffle(choices).slice(0, 3);
-          };
+  const getTranslation = (cat, key, langId) => {
+    const entry = DICTIONARY[cat]?.[key];
+    if (!entry) return key;
+    return entry[langId] || entry['es'] || key;
+  };
 
-          const addWordFlow = (category, key, list) => {
-            const foreign = getWord(category, key, lId);
-            const wrongs = getWrongChoices(category, key);
-            list.push({ 
-              id: `intro-${key}-${Math.random()}`,
-              type: 'tap', 
-              prompt: `Learn: "${key}"`, 
-              options: shuffle([foreign, ...wrongs]), 
-              answer: foreign 
-            });
-            list.push({ 
-              id: `reverse-${key}-${Math.random()}`,
-              type: 'tap', 
-              prompt: `What does "${foreign}" mean?`, 
-              options: shuffle([key, 'Large', 'Yellow', 'Fast']), 
-              answer: key 
-            });
-          };
+  const generateLesson = (lang, lesson) => {
+    const tasks = [];
+    const lId = lang.id;
+    const allVerbs = Object.keys(DICTIONARY.verbs);
+    const allNouns = Object.keys(DICTIONARY.nouns);
+    const allPronouns = Object.keys(DICTIONARY.pronouns);
+    const allPhrases = Object.keys(DICTIONARY.phrases);
 
-          if (lessonIdx === 0) {
-            // Lesson 1: Just Pronouns
-            ['I', 'He', 'She', 'Me'].forEach(k => addWordFlow('pronouns', k, tasks));
-            const name = NAMES[Math.floor(Math.random() * NAMES.length)];
-            tasks.push({ 
-              type: 'reorder', 
-              prompt: `Translate: "Me and ${name}"`, 
-              options: shuffle([getWord('pronouns', 'Me', lId), lang.and, name]), 
-              answer: [getWord('pronouns', 'Me', lId), lang.and, name] 
-            });
-            tasks.push({ 
-                type: 'reorder', 
-                prompt: `Translate: "He and She"`, 
-                options: shuffle([getWord('pronouns', 'He', lId), lang.and, getWord('pronouns', 'She', lId)]), 
-                answer: [getWord('pronouns', 'He', lId), lang.and, getWord('pronouns', 'She', lId)] 
-            });
-          } 
-          else if (lessonIdx === 1) {
-            // Lesson 2: Introduction to Phrases (after learning You)
-            addWordFlow('pronouns', 'You', tasks);
-            addWordFlow('phrases', 'How are you?', tasks);
-            addWordFlow('phrases', 'Thank you', tasks);
-            const greet = getWord('phrases', 'How are you?', lId);
-            const name = NAMES[Math.floor(Math.random() * NAMES.length)];
-            tasks.push({ 
-              type: 'reorder', 
-              prompt: `Translate: "How are you ${name}?"`, 
-              options: shuffle([greet, name]), 
-              answer: [greet, name] 
-            });
-            tasks.push({ 
-                type: 'tap', 
-                prompt: `Translate: "Thank you"`, 
-                options: shuffle([getWord('phrases', 'Thank you', lId), getWord('pronouns', 'You', lId), 'Hej']), 
-                answer: getWord('phrases', 'Thank you', lId)
-            });
-          }
-          else if (lessonIdx === 2) {
-            // Lesson 3: Mornings and Colors
-            addWordFlow('phrases', 'Good morning', tasks);
-            ['red', 'blue', 'green'].forEach(k => addWordFlow('colors', k, tasks));
-            const morning = getWord('phrases', 'Good morning', lId);
-            const name = NAMES[Math.floor(Math.random() * NAMES.length)];
-            tasks.push({ 
-                type: 'reorder', 
-                prompt: `Translate: "Good morning ${name}"`, 
-                options: shuffle([morning, name]), 
-                answer: [morning, name] 
-            });
-            tasks.push({ 
-                type: 'reorder', 
-                prompt: `Red and Blue`, 
-                options: shuffle([getWord('colors', 'red', lId), lang.and, getWord('colors', 'blue', lId)]), 
-                answer: [getWord('colors', 'red', lId), lang.and, getWord('colors', 'blue', lId)] 
-            });
-          }
-          else {
-            // Lesson 4+: Verbs and Nouns
-            const verbKeys = Object.keys(DICTIONARY.verbs);
-            const nounKeys = Object.keys(DICTIONARY.nouns);
-            const vK = verbKeys[lessonIdx % verbKeys.length];
-            const nK = nounKeys[lessonIdx % nounKeys.length];
-            addWordFlow('verbs', vK, tasks);
-            addWordFlow('nouns', nK, tasks);
-            addWordFlow('phrases', 'Good night', tasks);
-            
-            const pF = getWord('pronouns', 'I', lId);
-            const vF = getWord('verbs', vK, lId);
-            const nF = getWord('nouns', nK, lId);
-            const night = getWord('phrases', 'Good night', lId);
-            const name = NAMES[lessonIdx % NAMES.length];
+    const addWordTask = (cat, key) => {
+      const correct = getTranslation(cat, key, lId);
+      const distractors = shuffle(Object.keys(DICTIONARY[cat]))
+        .filter(k => k !== key)
+        .map(k => getTranslation(cat, k, lId));
+      
+      const options = shuffle([correct, ...distractors.slice(0, 3)]);
+      tasks.push({ type: 'tap', prompt: `Translate: "${key}"`, answer: correct, options });
+    };
 
-            tasks.push({ 
-                type: 'reorder', 
-                prompt: `Translate: "I ${vK} ${nK}"`, 
-                options: shuffle([pF, vF, nF, lang.and]), 
-                answer: [pF, vF, nF] 
-            });
-            tasks.push({ 
-                type: 'reorder', 
-                prompt: `Translate: "Good night ${name}"`, 
-                options: shuffle([night, name]), 
-                answer: [night, name] 
-            });
-          }
+    if (lesson.type === 'vocabulary') {
+      const keys = shuffle(Object.keys(DICTIONARY[lesson.cat])).slice(0, 5);
+      keys.forEach(k => addWordTask(lesson.cat, k));
+    } else {
+      for (let i = 0; i < 5; i++) {
+        // Occasionally mix in a phrase
+        if (Math.random() > 0.7) {
+          const phrase = shuffle(allPhrases)[0];
+          const target = getTranslation('phrases', phrase, lId);
+          tasks.push({
+            type: 'tap',
+            prompt: `Translate: "${phrase}"`,
+            answer: target,
+            options: shuffle([target, ...shuffle(allPhrases).filter(p => p !== phrase).slice(0, 3).map(p => getTranslation('phrases', p, lId))])
+          });
+        } else {
+          const p = shuffle(allPronouns)[0];
+          const v = shuffle(allVerbs)[0];
+          const n = shuffle(allNouns)[0];
 
-          // Pad to 8 tasks
-          while(tasks.length < 8) {
-            tasks.push({ ...tasks[Math.floor(Math.random() * tasks.length)], id: Math.random() });
-          }
-          return tasks.slice(0, 8);
-        };
+          const verbDisplay = (p === 'He' || p === 'She') ? DICTIONARY.verbs[v].thirdPerson : v;
+          const nounArticle = DICTIONARY.nouns[n].article;
+          const englishPrompt = `${p} ${verbDisplay} ${nounArticle ? nounArticle + ' ' : ''}${n}`;
 
-        function App() {
-          const [view, setView] = useState('landing');
-          const [selectedLang, setSelectedLang] = useState(null);
-          const [progress, setProgress] = useState(() => JSON.parse(localStorage.getItem('lingo_v6_prog') || '{}'));
-          const [stats, setStats] = useState(() => JSON.parse(localStorage.getItem('lingo_v6_stats') || '{"xp":0, "streak": 1}'));
-          const [currentTasks, setCurrentTasks] = useState([]);
-          const [taskIdx, setTaskIdx] = useState(0);
-          const [feedback, setFeedback] = useState(null);
-          const [selection, setSelection] = useState(null);
-          const [reorderList, setReorderList] = useState([]);
+          const targetArr = [getTranslation('pronouns', p, lId), getTranslation('verbs', v, lId), getTranslation('nouns', n, lId)];
+          const bankFillers = shuffle([...allPronouns, ...allVerbs, ...allNouns])
+            .map(k => {
+              if (DICTIONARY.pronouns[k]) return getTranslation('pronouns', k, lId);
+              if (DICTIONARY.verbs[k]) return getTranslation('verbs', k, lId);
+              return getTranslation('nouns', k, lId);
+            })
+            .filter(val => !targetArr.includes(val));
 
-          useEffect(() => {
-            localStorage.setItem('lingo_v6_prog', JSON.stringify(progress));
-            localStorage.setItem('lingo_v6_stats', JSON.stringify(stats));
-          }, [progress, stats]);
-
-          const startLesson = (idx) => {
-            setCurrentTasks(generateLessonTasks(selectedLang, idx));
-            setTaskIdx(0);
-            setFeedback(null);
-            setSelection(null);
-            setReorderList([]);
-            setView('lesson');
-          };
-
-          const handleCheck = () => {
-            const task = currentTasks[taskIdx];
-            const isCorrect = task.type === 'tap' ? selection === task.answer : JSON.stringify(reorderList) === JSON.stringify(task.answer);
-            setFeedback(isCorrect ? 'correct' : 'wrong');
-          };
-
-          const handleNext = () => {
-            if (taskIdx + 1 < currentTasks.length) {
-              setTaskIdx(taskIdx + 1);
-              setFeedback(null);
-              setSelection(null);
-              setReorderList([]);
-            } else {
-              const currentProg = progress[selectedLang.id] || 0;
-              setProgress(prev => ({ ...prev, [selectedLang.id]: currentProg + 1 }));
-              setStats(prev => ({ ...prev, xp: prev.xp + 10 }));
-              setView('curriculum');
-            }
-          };
-
-          if (view === 'landing') {
-            return (
-              <div className="min-h-screen bg-white p-6 flex flex-col items-center">
-                <header className="w-full flex justify-between items-center mb-12 max-w-2xl">
-                    <Globe className="text-green-600" size={32} />
-                    <div className="flex gap-4 font-black text-orange-500 items-center"><Flame size={20} /> {stats.streak}</div>
-                </header>
-                <h1 className="text-4xl font-black mb-2 text-center">LingoDash</h1>
-                <p className="text-gray-400 font-bold mb-8 text-center uppercase tracking-widest text-xs">Start Your Adventure</p>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 w-full max-w-4xl">
-                  {LANGUAGES.map(l => (
-                    <button key={l.id} onClick={() => { setSelectedLang(l); setView('curriculum'); }} className="p-5 border-4 border-gray-100 rounded-[32px] flex flex-col items-center gap-2 hover:bg-blue-50 transition-all active:scale-95 shadow-sm">
-                      <span className="text-4xl">{l.flag}</span>
-                      <span className="font-black text-gray-700 text-sm uppercase">{l.name}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            );
-          }
-
-          if (view === 'curriculum') {
-            const userProg = progress[selectedLang.id] || 0;
-            return (
-              <div className="min-h-screen bg-gray-50 flex flex-col">
-                <header className="bg-white p-6 border-b sticky top-0 z-20 flex items-center justify-between">
-                    <button onClick={() => setView('landing')} className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"><ChevronLeft /></button>
-                    <div className="font-black text-xl flex items-center gap-2">{selectedLang.flag} {selectedLang.name}</div>
-                    <div className="flex items-center gap-2 font-black text-blue-600">XP: {stats.xp}</div>
-                </header>
-                <main className="flex-1 overflow-y-auto p-6 flex flex-col items-center gap-8 pb-32">
-                    <div className="w-full max-w-md bg-green-500 p-8 rounded-[40px] text-white shadow-xl relative overflow-hidden">
-                        <h2 className="text-2xl font-black uppercase">Unit 1</h2>
-                        <p className="font-bold opacity-80">Pronouns & Greetings</p>
-                        <Trophy className="absolute -right-4 -bottom-4 w-24 h-24 text-white/20 rotate-12" />
-                    </div>
-                    <div className="flex flex-col items-center gap-6">
-                        {[...Array(12)].map((_, i) => {
-                            const locked = i > userProg;
-                            const done = i < userProg;
-                            const labels = ['Pronouns', 'Greetings', 'Colors', 'Verbs 1', 'Nouns 1', 'Dining', 'Animals', 'Social', 'Family', 'Travel'];
-                            return (
-                                <button key={i} disabled={locked} onClick={() => startLesson(i)} className={`w-20 h-20 rounded-full shadow-lg relative flex items-center justify-center transition-all ${locked ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : done ? 'bg-yellow-400 scale-90' : 'bg-green-500 border-b-8 border-green-700 active:border-b-0 active:translate-y-1'}`}>
-                                    {locked ? <Lock /> : done ? <CheckCircle2 className="text-white" /> : <Star className="text-white fill-white" />}
-                                    <div className="absolute -right-36 font-black text-gray-400 text-xs text-left w-32 uppercase">
-                                        {labels[i] || 'Practice'}
-                                    </div>
-                                </button>
-                            )
-                        })}
-                    </div>
-                </main>
-              </div>
-            );
-          }
-
-          if (view === 'lesson') {
-            const task = currentTasks[taskIdx];
-            return (
-              <div className="h-screen bg-white flex flex-col">
-                <div className="p-6">
-                    <div className="flex items-center gap-4 mb-4">
-                        <XCircle onClick={() => setView('curriculum')} className="text-gray-300 cursor-pointer hover:text-gray-500" />
-                        <div className="flex-1 h-3 bg-gray-100 rounded-full overflow-hidden">
-                            <div className="bg-green-500 h-full transition-all duration-500" style={{ width: `${(taskIdx / currentTasks.length) * 100}%` }} />
-                        </div>
-                        <span className="font-black text-gray-400 text-xs">{taskIdx + 1}/{currentTasks.length}</span>
-                    </div>
-                </div>
-                <div className="flex-1 overflow-y-auto px-6 pb-48 pt-4">
-                    <div className="max-w-xl mx-auto w-full">
-                        <div className="flex gap-4 mb-10 items-start">
-                            <div className="text-5xl animate-bounce">🦉</div>
-                            <div className="bg-white border-4 border-gray-100 p-6 rounded-[32px] font-black text-xl text-gray-800 shadow-sm flex-1 leading-tight">
-                                {task.prompt}
-                            </div>
-                        </div>
-                        {task.type === 'tap' ? (
-                            <div className="grid grid-cols-1 gap-3">
-                                {task.options.map((o, idx) => (
-                                    <button key={idx} onClick={() => !feedback && setSelection(o)} className={`p-5 text-left border-2 rounded-2xl font-black text-lg transition-all active:scale-[0.98] ${selection === o ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-100 hover:bg-gray-50'}`}>
-                                        <span className="mr-3 text-gray-300 text-sm font-bold">{idx + 1}</span> {o}
-                                    </button>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="flex flex-col gap-8">
-                                <div className="min-h-[120px] border-b-4 border-dashed border-gray-200 p-4 flex flex-wrap gap-2 bg-gray-50 rounded-[32px]">
-                                    {reorderList.map((w, i) => (
-                                        <button key={i} onClick={() => !feedback && setReorderList(reorderList.filter((_, idx) => idx !== i))} className="p-3 bg-white border-2 border-gray-200 rounded-xl font-black shadow-md text-base">
-                                            {w}
-                                        </button>
-                                    ))}
-                                </div>
-                                <div className="flex flex-wrap gap-2 justify-center">
-                                    {task.options.map((o, i) => (
-                                        <button key={i} onClick={() => !feedback && !reorderList.includes(o) && setReorderList([...reorderList, o])} className={`p-3 px-5 border-2 rounded-xl font-black text-base transition-all ${reorderList.includes(o) ? 'bg-gray-100 text-transparent border-gray-100 cursor-default' : 'bg-white border-gray-100 shadow-sm hover:border-gray-300 active:scale-95'}`}>
-                                            {o}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </div>
-                <div className={`fixed bottom-0 left-0 right-0 max-w-xl mx-auto p-8 pt-4 transition-all border-t-4 rounded-t-[40px] shadow-2xl z-40 ${feedback === 'correct' ? 'bg-green-100 border-green-200' : feedback === 'wrong' ? 'bg-red-100 border-red-200' : 'bg-white'}`}>
-                    {feedback && (
-                        <div className="mb-4 flex items-center gap-4 animate-in slide-in-from-bottom duration-300">
-                            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white text-2xl font-black ${feedback === 'correct' ? 'bg-green-500' : 'bg-red-500'}`}>
-                                {feedback === 'correct' ? '✓' : '✕'}
-                            </div>
-                            <div>
-                                <p className={`font-black text-xl ${feedback === 'correct' ? 'text-green-800' : 'text-red-800'}`}>
-                                    {feedback === 'correct' ? 'Spot on!' : 'Not quite!'}
-                                </p>
-                            </div>
-                        </div>
-                    )}
-                    <button onClick={feedback ? handleNext : handleCheck} disabled={!feedback && !selection && reorderList.length === 0} className={`w-full py-5 rounded-2xl font-black text-white text-xl transition-all active:scale-95 shadow-lg ${feedback ? (feedback === 'correct' ? 'bg-green-500' : 'bg-red-500') : (!selection && reorderList.length === 0 ? 'bg-gray-200' : 'bg-green-500')}`}>
-                        {feedback ? 'CONTINUE' : 'CHECK'}
-                    </button>
-                </div>
-              </div>
-            );
-          }
-          return null;
+          tasks.push({
+            type: 'reorder',
+            prompt: `Translate: "${englishPrompt}"`,
+            answer: targetArr,
+            options: shuffle([...targetArr, ...bankFillers.slice(0, 4)])
+          });
         }
+      }
+    }
+    return tasks;
+  };
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
-    </script>
-</body>
-</html>
+  const startLesson = (lesson) => {
+    setCurrentTasks(generateLesson(selectedLang, lesson));
+    setTaskIdx(0);
+    setFeedback(null);
+    setSelection(null);
+    setReorderList([]);
+    setView('lesson');
+  };
+
+  const handleCheck = () => {
+    const task = currentTasks[taskIdx];
+    const isCorrect = task.type === 'tap' 
+      ? selection === task.answer 
+      : JSON.stringify(reorderList) === JSON.stringify(task.answer);
+    setFeedback(isCorrect ? 'correct' : 'wrong');
+  };
+
+  const handleNext = () => {
+    if (taskIdx + 1 < currentTasks.length) {
+      setTaskIdx(taskIdx + 1);
+      setFeedback(null);
+      setSelection(null);
+      setReorderList([]);
+    } else {
+      const currentLevel = progress[selectedLang.id] || 0;
+      setProgress({ ...progress, [selectedLang.id]: currentLevel + 1 });
+      setView('curriculum');
+    }
+  };
+
+  if (view === 'landing') {
+    return (
+      <div className="min-h-screen bg-white p-8 flex flex-col items-center overflow-y-auto">
+        <header className="text-center mb-12">
+          <div className="w-20 h-20 bg-green-500 rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-xl">
+            <Globe className="text-white w-10 h-10" />
+          </div>
+          <h1 className="text-4xl font-black text-slate-800 tracking-tight">LingoDash Pro</h1>
+          <p className="text-slate-400 font-bold uppercase text-xs mt-2">World Mastery Edition</p>
+        </header>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 w-full max-w-6xl pb-10">
+          {LANGUAGES.map(l => (
+            <button key={l.id} onClick={() => { setSelectedLang(l); setView('curriculum'); }} className="p-4 border-4 border-slate-100 rounded-[2rem] hover:bg-indigo-50 hover:border-indigo-200 transition-all active:scale-95 shadow-sm text-center">
+              <span className="text-4xl block mb-2">{l.flag}</span>
+              <span className="font-black text-slate-700 text-sm">{l.name}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (view === 'curriculum') {
+    const userLevel = progress[selectedLang.id] || 0;
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col">
+        <nav className="bg-white p-4 border-b flex items-center justify-between sticky top-0 z-10 shadow-sm">
+          <button onClick={() => setView('landing')} className="p-2 hover:bg-slate-100 rounded-full"><ChevronLeft /></button>
+          <div className="font-black text-lg flex items-center gap-2">{selectedLang.flag} {selectedLang.name}</div>
+          <div className="w-10" />
+        </nav>
+        <main className="max-w-xl mx-auto w-full p-6 space-y-8 pb-32">
+          <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-[2.5rem] p-8 text-white shadow-xl relative overflow-hidden">
+            <h2 className="text-3xl font-black italic">Unit 1</h2>
+            <p className="font-bold opacity-80 uppercase text-sm tracking-widest">Foundations</p>
+            <Trophy className="absolute -right-4 -bottom-4 w-32 h-32 opacity-20 rotate-12" />
+          </div>
+          <div className="flex flex-col items-center gap-10">
+            {UNIT_LESSONS.map((item, i) => {
+              const isLocked = i > userLevel;
+              const isDone = i < userLevel;
+              return (
+                <div key={item.id} className="flex flex-col items-center w-full relative">
+                  {i < UNIT_LESSONS.length - 1 && (
+                    <div className={`absolute h-10 w-2 top-20 ${isDone ? 'bg-yellow-400' : 'bg-slate-200'}`} />
+                  )}
+                  <button 
+                    disabled={isLocked}
+                    onClick={() => startLesson(item)}
+                    className={`w-20 h-20 rounded-full flex items-center justify-center shadow-lg transition-all relative z-10 ${isLocked ? 'bg-slate-200 text-slate-400' : isDone ? 'bg-yellow-400 border-b-8 border-yellow-600' : 'bg-green-500 border-b-8 border-green-700 active:border-b-0 active:translate-y-1'}`}
+                  >
+                    {isLocked ? <Lock /> : isDone ? <Check size={32} className="text-white" /> : <Star size={32} className="text-white fill-white" />}
+                  </button>
+                  <span className={`mt-3 font-black uppercase text-[10px] tracking-[0.2em] ${isLocked ? 'text-slate-300' : 'text-slate-500'}`}>
+                    {item.title}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  const task = currentTasks[taskIdx];
+  const progressPercent = (taskIdx / currentTasks.length) * 100;
+
+  return (
+    <div className="h-screen bg-white flex flex-col overflow-hidden">
+      <div className="p-6 flex items-center gap-4">
+        <XCircle onClick={() => setView('curriculum')} className="text-slate-300 cursor-pointer hover:text-slate-500" />
+        <div className="flex-1 h-3 bg-slate-100 rounded-full overflow-hidden">
+          <div className="bg-green-500 h-full transition-all duration-500" style={{ width: `${progressPercent}%` }} />
+        </div>
+      </div>
+
+      <div className="flex-1 overflow-y-auto px-6 pb-44">
+        <div className="max-w-xl mx-auto py-6">
+          <div className="flex gap-4 mb-10 items-start">
+            <div className="text-5xl drop-shadow-md">🦉</div>
+            <div className="border-4 border-slate-100 p-6 rounded-[2.5rem] bg-white relative flex-1 shadow-sm">
+              <p className="text-xl font-black text-slate-800 leading-tight flex items-center gap-2">
+                {task.type === 'tap' ? <MessageCircle size={20} className="text-indigo-400" /> : null}
+                {task.prompt}
+              </p>
+            </div>
+          </div>
+
+          {task.type === 'tap' ? (
+            <div className="grid gap-3">
+              {task.options.map((opt, i) => (
+                <button 
+                  key={i} 
+                  disabled={feedback}
+                  onClick={() => setSelection(opt)}
+                  className={`p-5 text-left border-2 border-b-4 rounded-3xl font-black text-lg transition-all ${selection === opt ? 'bg-indigo-50 border-indigo-400 text-indigo-700' : 'border-slate-100 hover:bg-slate-50 text-slate-700'}`}
+                >
+                  <span className="text-slate-300 mr-3 text-sm">{i + 1}</span> {opt}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-8">
+              <div className="min-h-[160px] border-b-4 border-dashed border-slate-100 p-4 flex flex-wrap gap-2 items-start bg-slate-50/30 rounded-[2.5rem]">
+                {reorderList.map((w, i) => (
+                  <button key={i} disabled={feedback} onClick={() => setReorderList(reorderList.filter((_, idx) => idx !== i))} className="p-3 px-6 bg-white border-2 border-b-4 border-slate-200 rounded-2xl font-black shadow-md">
+                    {w}
+                  </button>
+                ))}
+              </div>
+              <div className="flex flex-wrap gap-3 justify-center">
+                {task.options.map((opt, i) => (
+                  <button 
+                    key={i} 
+                    disabled={reorderList.includes(opt) || feedback}
+                    onClick={() => setReorderList([...reorderList, opt])}
+                    className={`p-3 px-6 border-2 border-b-4 rounded-2xl font-black transition-all ${reorderList.includes(opt) ? 'bg-slate-100 border-slate-100 text-transparent' : 'bg-white border-slate-200 hover:border-slate-400 active:translate-y-1 active:border-b-0'}`}
+                  >
+                    {opt}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <footer className={`fixed bottom-0 left-0 right-0 p-8 pt-4 border-t-4 transition-all z-50 ${feedback === 'correct' ? 'bg-green-100 border-green-200' : feedback === 'wrong' ? 'bg-red-100 border-red-200' : 'bg-white'}`}>
+        <div className="max-w-xl mx-auto">
+          {feedback && (
+            <div className="mb-4 flex items-center gap-4">
+              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-white ${feedback === 'correct' ? 'bg-green-500' : 'bg-red-500'}`}>
+                {feedback === 'correct' ? <Check size={32} /> : <X size={32} />}
+              </div>
+              <div>
+                <p className={`text-xl font-black ${feedback === 'correct' ? 'text-green-800' : 'text-red-800'}`}>
+                  {feedback === 'correct' ? 'Excellent!' : 'Not quite right!'}
+                </p>
+                {feedback === 'wrong' && (
+                   <p className="text-red-600 font-bold text-sm">Correct answer: {Array.isArray(task.answer) ? task.answer.join(' ') : task.answer}</p>
+                )}
+              </div>
+            </div>
+          )}
+          <button 
+            onClick={feedback ? handleNext : handleCheck}
+            disabled={!feedback && !selection && reorderList.length === 0}
+            className={`w-full py-5 rounded-3xl font-black text-xl shadow-xl transition-all active:scale-[0.98] ${feedback ? (feedback === 'correct' ? 'bg-green-500 text-white' : 'bg-red-500 text-white') : (!selection && reorderList.length === 0 ? 'bg-slate-200 text-slate-400' : 'bg-green-500 text-white shadow-green-200')}`}
+          >
+            {feedback ? 'CONTINUE' : 'CHECK'}
+          </button>
+        </div>
+      </footer>
+    </div>
+  );
+}
